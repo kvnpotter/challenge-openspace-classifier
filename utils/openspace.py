@@ -1,8 +1,10 @@
 from table import Table
 from random import sample
+from math import floor
 from shapely.geometry import Point, Polygon
 import matplotlib.pyplot as plt
 import geopandas as gpd
+import pandas as pd
 
 class Openspace:
     ...
@@ -33,18 +35,17 @@ class Openspace:
         table_x_coords = []
         table_y_coords = []
         table_lengths = []
-        table_width = 5
         
         # Loop over tables, assign column (4 rows of tables per column max), calculate x coordinate center table
         for i in range(self.number_of_tables):
-            column = round(i/4)
+            column = floor(i/4)
             center_table_x = column * 25 + 12.5
             table_x_coords.append(center_table_x)
         
         # Create table index, go over all tables in groups of 4 (rows per column), calculate variable table length depending on 
         # number of occupants, calculate y coordinate center table
         table_index = 0
-        while table_index + 1 < self.number_of_tables :
+        while table_index < self.number_of_tables :
             for i in range(4):
                 number_occupants_side = self.tables[table_index].capacity - self.tables[table_index].capacity // 2
                 table_length = number_occupants_side * 2 + 2
@@ -52,6 +53,8 @@ class Openspace:
                 center_table_y = (table_length / 2 + 5) + (i * (table_length + 10))
                 table_y_coords.append(center_table_y)
                 table_index += 1
+        while len(table_y_coords) > len(table_x_coords):
+            table_y_coords.pop(-1)
 
         # Create a list of shapely Point() objects from lists of x and y coordinates
         tables_points = []
@@ -70,31 +73,41 @@ class Openspace:
         # Into GeoDataFrame
         tables_gdf = gpd.GeoDataFrame(geometry = tables)
 
+        # Add central points to GDF
+        tables_gdf["center"] = tables_points
+
+        # Create list of remaining seats per table and add to GDF
+        remaining_seats = []
+        for table in self.tables:
+            remaining_seats.append(table.left_capacity())
+        tables_gdf["free_seats"] = remaining_seats
+
+        # Create seating plan
+        seating_plan = []
+        for table in self.tables:
+            table_names = ""
+            for seat in table.seats:
+                table_names += "\n" + seat.occupant
+            seating_plan.append(table_list)
+        tables_gdf["occupants"] = seating_plan
+
         # Create plot and visualise
-
-        f, ax = plt.subplots(1,1)
-        tables_gdf.plot(ax = ax)
-
-                table.append(tables_points[0])
-                tables_points.pop(0)
-                table_index += 1
-            new_table = Polygon(table)
-            tables.append(new_table)
-            table=[]
-            
-        while point_counter < 4 :
-            table.append(tables_points[0])
-            tables_points.pop(0)
-            point_counter += 1
-        else:
-            new_table = Polygon(table)
-            tables.append(new_table)
-            table = []
-            point_counter = 0
-
-        number_occupants = self.tables[table_index].capacity - self.tables[table_index].left_capacity()
-            
-            
-
-    def store(self, filename: str) -> None:
+        ax = tables_gdf.plot()
+        tables_gdf.apply(lambda x: ax.annotate(text=f"free seats:\n{x['free_seats']}\noccupants:\n{x["occupants"]}", xy=x.geometry.centroid.coords[0], ha='center'), va='center', axis=1);
+        plt.show()
+       
+        def store(self, filename: str) -> None:
         ...
+        names_placing = []
+        table_number = []
+        seat_number = []
+        for table_index, table in enumerate(self.tables):
+            for seat_index, seat in enumerate(table.seats):
+                names_placing.append(seat.occupant)
+                seat_number.append(seat_index+1)
+                table_number.append(table_index+1)
+        placement = {'Name': names_placing,
+                     'table_number': table_number,
+                     'seat_number': seat_number}
+        placement_df = pd.DataFrame(placement)
+        placement_df.to_excel(filename + ".xslx")
