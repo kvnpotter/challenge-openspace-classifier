@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import geopandas as gpd
 import pandas as pd
 
-
+# Define class openspace with __init__ method
 class Openspace:
     """
     A class representing an openspace.
@@ -29,10 +29,14 @@ class Openspace:
 
         :param: people (list): A list of people to seat.
         """
+        # Create list of total available seat indices
         total_seats = [i for i in range(0, self.number_of_tables * 4)]
+        # Check enough seats for people in list
         if len(people) > len(total_seats):
             print("NOT ENOUGH SEATS !")
         else:
+            # Loop over people list, randomly select free seat index and remove from list
+            # Calculate table and seat-at-table index, assign person to obtained seat
             for person in people:
                 random_sample = sample(total_seats, 1)
                 total_seats.remove(random_sample[0])
@@ -157,6 +161,7 @@ class Openspace:
         names_placing = []
         table_number = []
         seat_number = []
+        # Create lists of names, table number and seat number, store in dict
         for table_index, table in enumerate(self.tables):
             for seat_index, seat in enumerate(table.seats):
                 names_placing.append(seat.occupant)
@@ -167,6 +172,7 @@ class Openspace:
             "table_number": table_number,
             "seat_number": seat_number,
         }
+        # Create pandas df based on dict and export to excel
         placement_df = pd.DataFrame(placement)
         placement_df.to_excel(filename + ".xlsx")
 
