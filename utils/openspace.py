@@ -14,14 +14,17 @@ class Openspace:
     A class representing an openspace.
     """
 
-    def __init__(self, number_of_tables: int = 6) -> None:
+    def __init__(self, number_of_tables: int = 6, number_seats_per_table: int = 4) -> None:
         """
         Create an openspace with specified number of tables.
 
         :param number_of_tables: (int, optional): Number of tables to create in the openspace. Defaults to 6.
+        :param number_of_seats_per_table: (int, optional): Number of seats to add to each table. Defaults to 4.
         """
-        self.number_of_tables: int = number_of_tables
-        self.tables: list[Table] = [Table() for _ in range(self.number_of_tables)]
+        self.number_of_tables = number_of_tables
+        self.number_of_seats_per_table = number_seats_per_table
+        self.seat_index_list = list(range(0, (self.number_of_tables * self.number_of_seats_per_table)))
+        self.tables: list[Table] = [Table(self.number_of_seats_per_table) for _ in range(self.number_of_tables)]
 
     def organize(self, people: list) -> None:
         """
@@ -30,19 +33,29 @@ class Openspace:
         :param: people (list): A list of people to seat.
         """
         # Create list of total available seat indices
-        total_seats = [i for i in range(0, self.number_of_tables * 4)]
+        #total_seats = [i for i in range(0, self.number_of_tables * 4)]
         # Check enough seats for people in list
-        if len(people) > len(total_seats):
+        while len(people) > len(self.seat_index_list):
             print("NOT ENOUGH SEATS !")
+            answer = input("Do you wish to add a table? (y/n)")
+            if answer == "y":
+                self.seat_index_list.extend(list(range((self.number_of_seats_per_table * self.number_of_tables), (self.number_of_seats_per_table*self.number_of_tables) + self.number_of_seats_per_table)))
+                self.number_of_tables += 1
+                self.tables.append(Table(self.number_of_seats_per_table))
+            elif answer == "n":
+                print("Ok, BYE!")
+                break
+            else:
+                print("Incorrect input.")
         else:
             # Loop over people list, randomly select free seat index and remove from list
             # Calculate table and seat-at-table index, assign person to obtained seat
             for person in people:
-                random_sample = sample(total_seats, 1)
-                total_seats.remove(random_sample[0])
+                random_sample = sample(self.seat_index_list, 1)
+                self.seat_index_list.remove(random_sample[0])
                 random_seat = random_sample[0] % 4
                 random_table = random_sample[0] // 4
-                self.tables[random_table].seats[random_seat].set_occupant(person)
+                self.tables[random_table].seats[random_seat].set_occupant(person, random_sample)
 
     def display(self) -> None:
         """
@@ -95,6 +108,7 @@ class Openspace:
         for x, y in zip(table_x_coords, table_y_coords):
             tables_points.append(Point(x, y))
 
+
         # Create a list of tables (polygons), each a list of 4 points (corners of each table)
         tables = []
         for index, center_point in enumerate(tables_points):
@@ -111,7 +125,6 @@ class Openspace:
                 center_point.x + 2.5, center_point.y + table_lengths[index] / 2
             )
             tables.append(Polygon([point_1, point_2, point_3, point_4]))
-
         # Into GeoDataFrame
         tables_gdf = gpd.GeoDataFrame(geometry=tables)
 
@@ -183,3 +196,14 @@ class Openspace:
             number_free_tables += table.has_free_spot()
             number_free_seats += table.left_capacity()
         return f"This is an openspace organizer.\nThere are {number_free_tables} tables with free seats.\nThere are {number_free_seats} free seats left."
+
+    def number_remaining_seats(self):
+        """
+        Print number remaining free seats in openspace.
+        """
+        number_free_seats = 0
+        for table in self.tables:
+            number_free_seats += table.left_capacity()
+        print(f"There are {number_free_seats} free seats available in this openspace.")
+
+    

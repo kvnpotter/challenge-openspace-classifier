@@ -9,8 +9,9 @@ class Seat:
         """
         self.free = True
         self.occupant = "None"
+        self.index = 0
 
-    def set_occupant(self, name: str) -> None:
+    def set_occupant(self, name: str, seat_index: int) -> None:
         """
         Set seat occupancy status and occupant.
 
@@ -18,6 +19,7 @@ class Seat:
         """
         self.occupant = name
         self.free = False
+        self.index = seat_index
 
     def remove_occupant(self) -> None:
         """
