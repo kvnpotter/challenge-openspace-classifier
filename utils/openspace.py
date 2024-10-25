@@ -1,7 +1,8 @@
 from table import Table
 from random import sample
 from math import floor
-from shapely.geometry import Point, Polygon
+from shapely.geometry import Point
+from shapely.geometry.polygon import Polygon
 import matplotlib.pyplot as plt
 import geopandas as gpd
 import pandas as pd
@@ -12,7 +13,7 @@ class Openspace:
     def __init__(self, number_of_tables: int = 6) -> None:
         ...
         self.number_of_tables: int = number_of_tables
-        self.tables: list[Table] = [Table for _ in range(self.number_of_tables)]
+        self.tables: list[Table] = [Table() for _ in range(self.number_of_tables)]
 
     def organize(self, people: list) -> None:
         ...
@@ -22,12 +23,10 @@ class Openspace:
         else:
             for person in people:
                 random_sample = sample(total_seats,1)
-                total_seats.remove(random_sample)
-                random_seat = random_sample // 6
-                random_table = random_sample // 4
-                self.tables[random_table].assign_seat(person) #What is this for
+                total_seats.remove(random_sample[0])
+                random_seat = random_sample[0] // 6
+                random_table = random_sample[0] // 4
                 self.tables[random_table].seats[random_seat].set_occupant(person)
-
     def display(self) -> None:
         ...
 
@@ -46,13 +45,23 @@ class Openspace:
         # number of occupants, calculate y coordinate center table
         table_index = 0
         while table_index < self.number_of_tables :
-            for i in range(4):
-                number_occupants_side = self.tables[table_index].capacity - self.tables[table_index].capacity // 2
-                table_length = number_occupants_side * 2 + 2
-                table_lengths.append(table_length)
-                center_table_y = (table_length / 2 + 5) + (i * (table_length + 10))
-                table_y_coords.append(center_table_y)
-                table_index += 1
+            remaining_tables = self.number_of_tables - (table_index)
+            if remaining_tables >= 4:
+                for i in range(4):
+                    number_occupants_side = self.tables[table_index].capacity - self.tables[table_index].capacity // 2
+                    table_length = number_occupants_side * 2 + 2
+                    table_lengths.append(table_length)
+                    center_table_y = (table_length / 2 + 5) + (i * (table_length + 10))
+                    table_y_coords.append(center_table_y)
+                    table_index += 1
+            elif remaining_tables < 4:
+                for i in range(remaining_tables):
+                    number_occupants_side = self.tables[table_index].capacity - self.tables[table_index].capacity // 2
+                    table_length = number_occupants_side * 2 + 2
+                    table_lengths.append(table_length)
+                    center_table_y = (table_length / 2 + 5) + (i * (table_length + 10))
+                    table_y_coords.append(center_table_y)
+                    table_index += 1               
         while len(table_y_coords) > len(table_x_coords):
             table_y_coords.pop(-1)
 
@@ -64,11 +73,11 @@ class Openspace:
         # Create a list of tables (polygons), each a list of 4 points (corners of each table)
         tables = []
         for index, center_point in enumerate(tables_points):
-                point_1 = Point(center_point.x - 2.5, center_point.y + table_lengths[index] / 2)
-                point_2 = Point(center_point.x - 2.5, center_point.y - table_lengths[index] / 2)
-                point_3 = Point(center_point.x + 2.5, center_point.y + table_lengths[index] / 2)
-                point_4 = Point(center_point.x + 2.5, center_point.y - table_lengths[index] / 2)
-                tables.append(Polygon[point_1, point_2, point_3, point_4])
+            point_1 = Point(center_point.x - 2.5, center_point.y + table_lengths[index] / 2)
+            point_2 = Point(center_point.x - 2.5, center_point.y - table_lengths[index] / 2)
+            point_3 = Point(center_point.x + 2.5, center_point.y - table_lengths[index] / 2)
+            point_4 = Point(center_point.x + 2.5, center_point.y + table_lengths[index] / 2)
+            tables.append(Polygon([point_1, point_2, point_3, point_4]))
         
         # Into GeoDataFrame
         tables_gdf = gpd.GeoDataFrame(geometry = tables)
@@ -88,15 +97,29 @@ class Openspace:
             table_names = ""
             for seat in table.seats:
                 table_names += "\n" + seat.occupant
-            seating_plan.append(table_list)
+            seating_plan.append(table_names)
         tables_gdf["occupants"] = seating_plan
 
         # Create plot and visualise
         ax = tables_gdf.plot()
-        tables_gdf.apply(lambda x: ax.annotate(text=f"free seats:\n{x['free_seats']}\noccupants:\n{x["occupants"]}", xy=x.geometry.centroid.coords[0], ha='center'), va='center', axis=1);
+
+        placement_list = []
+        for i, j in tables_gdf.iterrows():
+            string = f"free seats:\n{j.iloc[2]}\noccupants:\n{j.iloc[3]}"
+            placement_list.append(string)
+
+        tables_gdf['display_text'] = placement_list
+
+        x = [j['geometry'].centroid.coords[0] for i, j in tables_gdf.iterrows()]
+        texts = [j['display_text'] for i, j in tables_gdf.iterrows()]
+        new_df = pd.DataFrame({"x":x, "y" : y, "texts":texts})
+
+        for i, j in new_df.iterrows():
+            ax.annotate(text = j['texts'], xy = j['x'], ha='center', va='center')
+
         plt.show()
        
-        def store(self, filename: str) -> None:
+    def store(self, filename: str) -> None:
         ...
         names_placing = []
         table_number = []
@@ -110,4 +133,4 @@ class Openspace:
                      'table_number': table_number,
                      'seat_number': seat_number}
         placement_df = pd.DataFrame(placement)
-        placement_df.to_excel(filename + ".xslx")
+        placement_df.to_excel(filename + ".xlsx")
