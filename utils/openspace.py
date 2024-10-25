@@ -1,4 +1,4 @@
-from table import Table
+from table_kevin import Table
 from random import sample
 from math import floor
 from shapely.geometry import Point

@@ -1,4 +1,4 @@
-from table import Seat, Table
+from table_kevin import Seat, Table
 from openspace import Openspace
 
 namelist = ["Jean", "KEvin", "Franck", "Evris", "Tom", "Dick", "arr"]
