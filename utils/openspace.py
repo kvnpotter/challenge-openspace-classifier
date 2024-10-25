@@ -24,7 +24,7 @@ class Openspace:
             for person in people:
                 random_sample = sample(total_seats,1)
                 total_seats.remove(random_sample[0])
-                random_seat = random_sample[0] // 6
+                random_seat = random_sample[0] % 4
                 random_table = random_sample[0] // 4
                 self.tables[random_table].seats[random_seat].set_occupant(person)
     def display(self) -> None:
@@ -134,3 +134,11 @@ class Openspace:
                      'seat_number': seat_number}
         placement_df = pd.DataFrame(placement)
         placement_df.to_excel(filename + ".xlsx")
+
+    def __str__(self):
+        number_free_tables = 0
+        number_free_seats = 0
+        for table in self.tables:
+            number_free_tables += table.has_free_spot()
+            number_free_seats += table.left_capacity()
+        return f"This is an openspace organizer.\nThere are {number_free_tables} tables with free seats.\nThere are {number_free_seats} free seats left."
