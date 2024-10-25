@@ -61,5 +61,3 @@ This program requires the installation of following packages:
 | table.py (Seat, Table)                            | README.md                                                |
 | openspace.py (Openspace)                          |                                                          |
 
-    
-## 7. Personal situation
