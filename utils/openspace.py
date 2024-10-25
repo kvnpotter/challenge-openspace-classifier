@@ -135,7 +135,7 @@ class Openspace:
         placement_df = pd.DataFrame(placement)
         placement_df.to_excel(filename + ".xlsx")
 
-    def __str__(self):
+    def __str__(self) -> str:
         number_free_tables = 0
         number_free_seats = 0
         for table in self.tables:
