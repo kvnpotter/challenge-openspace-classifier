@@ -1,3 +1,4 @@
+# Necessary imports
 from table_kevin import Table
 from random import sample
 from math import floor
