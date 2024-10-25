@@ -8,15 +8,24 @@ import geopandas as gpd
 import pandas as pd
 
 class Openspace:
-    ...
-
+    """
+    A class representing an openspace.
+    """
     def __init__(self, number_of_tables: int = 6) -> None:
-        ...
+        """
+        Create an openspace with specified number of tables.
+
+        :param number_of_tables: (int, optional): Number of tables to create in the openspace. Defaults to 6.
+        """
         self.number_of_tables: int = number_of_tables
         self.tables: list[Table] = [Table() for _ in range(self.number_of_tables)]
 
     def organize(self, people: list) -> None:
-        ...
+        """
+        Randomly allocate people in specified list to free seats in the openspace.
+        
+        :param: people (list): A list of people to seat.
+        """
         total_seats = [i for i in range(0, self.number_of_tables * 4)]
         if len(people) > len(total_seats):
             print("NOT ENOUGH SEATS !")
@@ -27,8 +36,11 @@ class Openspace:
                 random_seat = random_sample[0] % 4
                 random_table = random_sample[0] // 4
                 self.tables[random_table].seats[random_seat].set_occupant(person)
+
     def display(self) -> None:
-        ...
+        """
+        Create a seating plan of allocated seats.
+        """
 
         # Create empty lists to contain table x and y coordinates, table length and the variable table width
         table_x_coords = []
@@ -120,7 +132,11 @@ class Openspace:
         plt.show()
        
     def store(self, filename: str) -> None:
-        ...
+        """
+        Store the current seating plan in an Excel file.
+        
+        :param filename: (str): String specifying the filename to export to.
+        """
         names_placing = []
         table_number = []
         seat_number = []
