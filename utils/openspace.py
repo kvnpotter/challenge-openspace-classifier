@@ -258,3 +258,16 @@ class Openspace:
             self.store("Updated_seating_plan")
         else:
             print("Invalid input!")
+
+    def occupant_list(self) -> None:
+        """
+        Print a list of current occupants of the openspace
+        """
+        occupant_list = ""
+        for table in self.tables:
+            for seat in table.seats:
+                if seat.occupant != "None":
+                    occupant_list += "\n" + seat.occupant
+                else:
+                    pass
+        print("Here is the list of the occupants:" + occupant_list)
