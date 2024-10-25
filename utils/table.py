@@ -27,6 +27,7 @@ class Seat:
         """
         self.occupant = "None"
         self.free = True
+        self.index = 0
 
     def __str__(self) -> str:
         if self.free:

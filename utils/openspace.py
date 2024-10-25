@@ -206,4 +206,55 @@ class Openspace:
             number_free_seats += table.left_capacity()
         print(f"There are {number_free_seats} free seats available in this openspace.")
 
-    
+    def add_arrival(self, name: str) -> None:
+        """
+        Add a newly arrived person to the openspace seating plan.
+
+        :param name: (str): String of the person's name.
+        """
+
+        if len(self.seat_index_list) > 0:
+            random_sample = sample(self.seat_index_list, 1)
+            self.seat_index_list.remove(random_sample[0])
+            random_seat = random_sample[0] % 4
+            random_table = random_sample[0] // 4
+            self.tables[random_table].seats[random_seat].set_occupant(name, random_sample)
+        else:
+            self.seat_index_list.extend(list(range((self.number_of_seats_per_table * self.number_of_tables), (self.number_of_seats_per_table*self.number_of_tables) + self.number_of_seats_per_table)))
+            self.number_of_tables += 1
+            self.tables.append(Table(self.number_of_seats_per_table))
+            random_sample = sample(self.seat_index_list, 1)
+            self.seat_index_list.remove(random_sample[0])
+            random_seat = random_sample[0] % 4
+            random_table = random_sample[0] // 4
+            self.tables[random_table].seats[random_seat].set_occupant(name, random_sample)
+
+    def remove_departure(self, name: str) -> None:
+        """
+        Handle departure from openspace.
+            
+        param: (str): String of the departing person's name.
+        """
+        for table in self.tables:
+            for seat in table.seats:
+                if name == seat.occupant:
+                    self.seat_index_list.append(seat.index)
+                    seat.remove_occupant()
+
+    def handle_changes(self, input: str, name: str) -> None:
+        """
+        Handle changes in seating plan, arrivals and departures.
+            
+        :param input: (str): String specifying departure or arrival.
+        :param name: (Str): String of the person's name.
+        """
+        if input == "arrival":
+            self.add_arrival(name)
+            self.display()
+            self.store("Updated_seating_plan")
+        elif input == "departure":
+            self.remove_departure(name)
+            self.display()
+            self.store("Updated_seating_plan")
+        else:
+            print("Invalid input!")
