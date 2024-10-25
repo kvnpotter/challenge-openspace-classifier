@@ -49,5 +49,6 @@ class Table:
     def __str__(self):
         occupants = ""
         for seat in self.seats:
-            occupants += f"{seat.occupant}/n"
-        return f"This is a table.\nThere are {left_capacity(self)} free seats.\nThe occupants are:\n{occupants}"
+            if seat.occupant != "None":
+                occupants += f"{seat.occupant}\n"
+        return f"This is a table.\nThere are {self.left_capacity()} free seats.\nThe occupants are:\n{occupants}"
