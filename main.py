@@ -16,7 +16,7 @@ openspace_1.store("seating_plan")
 while True:
     question = input("Do you want to request information on the seating plan or occupancy? (y/n) :")
     if question == "y":
-        disp = input("Display number of remaining seats, total seats in the room,\n number people in the room or graphic seating plan? (left_seat/tot_seat/people/graph) :y")
+        disp = input("Display number of remaining seats, total seats in the room,\n number people in the room or graphic seating plan? (left_seat/tot_seat/people/graph) :")
         if disp == "left_seat":
             openspace_1.number_remaining_seats()
         elif disp == "tot_seat":
