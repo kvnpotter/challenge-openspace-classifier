@@ -149,7 +149,7 @@ class Openspace:
 
         for i, j in new_df.iterrows():
             ax.annotate(text=j["texts"], xy=j["x"], ha="center", va="center")
-
+        plt.axis('off')
         plt.show()
 
     def store(self, filename: str) -> None:
