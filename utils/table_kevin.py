@@ -2,13 +2,14 @@ class Seat:
     """
     Class representing a seat.
     """
+
     def __init__(self) -> None:
         """
         Create a seat with it's attributes, occupancy status and occupant, both empty.
         """
         self.free = True
         self.occupant = "None"
-    
+
     def set_occupant(self, name: str) -> None:
         """
         Set seat occupancy status and occupant.
@@ -17,7 +18,7 @@ class Seat:
         """
         self.occupant = name
         self.free = False
-    
+
     def remove_occupant(self) -> None:
         """
         Remove seat occupant, reset occupancy status attributes.
@@ -32,10 +33,12 @@ class Seat:
             status = "occupied"
         return f"This is a chair.\nIt is currently {status}.\nIt's occupant is {self.occupant}."
 
+
 class Table:
     """
     Class representing a table.
     """
+
     def __init__(self, capacity: int = 4) -> None:
         """
         Create a table with a number of chairs.
@@ -55,7 +58,7 @@ class Table:
         for seat in self.seats:
             result += seat.free
         return bool(result)
-    
+
     def assign_seat(self, name: str) -> None:
         """
         Assign a person to a seat
@@ -72,7 +75,7 @@ class Table:
                     continue
         else:
             print("table full")
-    
+
     def left_capacity(self) -> int:
         """
         Verify number of remaining free seats at the table.
@@ -81,9 +84,9 @@ class Table:
         """
         taken = 0
         for seat in self.seats:
-            taken += not(seat.free)
-        return self.capacity - taken 
-    
+            taken += not (seat.free)
+        return self.capacity - taken
+
     def __str__(self) -> str:
         occupants = ""
         for seat in self.seats:
