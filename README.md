@@ -1,5 +1,20 @@
 # Openspace classifier challenge
 
+## Remarks
+
+This repository contains the final version of the first project I worked on during my AI and Data science bootcamp training at BeCode (Brussels, Belgium). While I am aware the code may not be optimal, keep in mind that the assignment for this project was due after only one and a half weeks of training and introduction to Python and Git/GitHub.
+
+My contributions to this project are:
+  - table.py : collaboration and contributions with Stef
+  - openspace.py : full authorship
+  - main.py : full authorship
+
+The repository contains 2 branches
+  - main : functional, but limited. (The program does not accept excel files containing more than 24 names)
+  - Nice-to-haves : same as main, with added functionality. (More than 24 names, user interaction, ...)
+
+This repository is a copy of the [original](https://github.com/StefVandekerckhove1/Project) I contributed to on Stef's profile.
+
 ## 1. Description
 
   Welcome to our openspace classifier!
